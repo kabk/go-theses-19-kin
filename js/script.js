@@ -88,12 +88,37 @@
 //   container.onmousemove = onMouseMoveHandler;
 // })();
 
-$(document).scroll(function () {
-        $("#sticky").css({
-            "top": "0",
-            "position": $(this).scrollTop() > 105 ? "fixed" : "relative"
-        });
+var cmd = false;
+
+$(document).on('keydown', function(e) {
+
+    if(detectMacCommand(e.which)) {
+        cmd = true;
+        return;
+    }
+
+    // now detect print (ctr/cmd + p)
+    if ( e.which == 80 && ( e.ctrl || cmd ) ) {
+        e.preventDefault();
+        alert('redirect to PDF');
+    }
+
+}).on('keyup', function(e) {
+
+    if(detectMacCommand(e.which)) {
+        cmd = false;
+        return;
+    }
+
 });
+
+function detectMacCommand(key) {
+    return ( $.browser.mozilla && key == 224 ||
+             $.browser.opera   && key == 17 ||
+             $.browser.webkit  && ( key == 91 || key == 93 ));
+}
+
+
 
 $(window).on('scroll', function () {
     var pixs = $(window).scrollTop() - $('#image1').offset().top
@@ -105,9 +130,13 @@ $(window).on('scroll', function () {
     $(".out2").css({"-webkit-filter": "blur("+pixs2+"px)","filter": "blur("+pixs2+"px)" })
 });
 
-$('a').click(function(){
-    $('html, body').animate({
-        scrollTop: $( $(this).attr('href') ).offset().top
-    }, 500);
-    return false;
+$(function() {
+ $('a').bind('click',function(event){
+     var $anchor = $(this);
+
+     $('html, body').stop().animate({
+         scrollTop: $($anchor.attr('href')).offset().top
+     }, 800);
+     event.preventDefault();
+ });
 });
